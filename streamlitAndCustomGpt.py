@@ -25,10 +25,16 @@ def get_citations(api_token, project_id, citation_id):
         result = json.loads(response.text)
         if result['status'] == 'success':
             try:
-                source = {'title': result['data']['title'], 'url': result['data']['url'] }
+                if result['data']['url'] != None:
+                    source = {'title': result['data']['title'], 'url': result['data']['url'] }
+                else:
+                    source = {'title': 'source', 'url': "" }
                 
             except:
-                source = {'title': 'source', 'url': result['citation']['page_url'] }
+                if result['citation']['page_url'] != None:
+                    source = {'title': 'source', 'url': result['citation']['page_url'] }
+                else:
+                    source = {'title': 'source', 'url': "" }
             
             return source
         else:
@@ -81,16 +87,20 @@ def query_chatbot(api_token, project_id,session_id,message,stream='true', lang='
 
             if resp_data['status'] == 'finish' and resp_data['citations'] != None:
                 citation_ids = resp_data['citations']
-                citations = "\n\n (Source: "
+                citations = ""
                 for citation_id in citation_ids:
                     citation_obj = get_citations(api_token, project_id,citation_id)
-                    if citation_id == citation_ids[-1]:
-                        citations += citation_obj['url']+" )"
-                    else:
-                        citations += citation_obj['url']+", "
+                    if len(citation_obj['url']) > 0:
+                        if citation_id == citation_ids[-1]:
+                            citations += citation_obj['url']
+                        else:
+                            citations += citation_obj['url']+", "
+
+                if len(citations) > 0:
+                    cita = "\n\n (Source: " + citations + " )"
 
                 
-                response.append(citations)
+                    response.append(cita)
         
         return response     
     except requests.exceptions.RequestException as e:
@@ -145,7 +155,7 @@ with st.sidebar:
     st.title('CustomGPT Chatbot')
    
     replicate_api = st.text_input('Enter Replicate API token:', type='password')
-    if not (replicate_api.startswith('r8_') and len(replicate_api)==40):
+    if not replicate_api:
         st.warning('Please enter your credentials!', icon='⚠️')
     else:
         st.success('Proceed to entering your prompt message!', icon='👉')
