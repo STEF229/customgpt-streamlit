@@ -154,7 +154,7 @@ with st.sidebar:
     if not replicate_api:
         st.warning('Please enter your credentials!', icon='⚠️')
     else:
-        st.success('Please select a project and conversation!', icon='👉')
+        st.success('Please select a project and conversation!', )
     os.environ['REPLICATE_API_TOKEN'] = replicate_api
 
     st.subheader('Select a project')
@@ -174,7 +174,7 @@ with st.sidebar:
                 selected_conv = listConversation[indx]
 
                 if selected_conv:
-                    st.success(f'Now you can start!!')
+                    st.success(f'Now you can start!!', icon='👉')
             else:
                 st.warning('No conversations found for the selected project. You can create a new conversation below.', icon='⚠️')
                 new_conv_name = st.text_input('Enter a name for the new conversation:')
