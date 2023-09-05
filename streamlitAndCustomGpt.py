@@ -174,7 +174,7 @@ with st.sidebar:
                 selected_conv = listConversation[indx]
 
                 if selected_conv:
-                    st.write(f'Selected Conversation: {selected_conv["name"]}')
+                    st.success(f'Now you can start!!')
             else:
                 st.warning('No conversations found for the selected project. You can create a new conversation below.', icon='⚠️')
                 new_conv_name = st.text_input('Enter a name for the new conversation:')
