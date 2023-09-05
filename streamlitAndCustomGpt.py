@@ -5,14 +5,14 @@ import json
 from sseclient import SSEClient
 
 
-api_endpoint = 'https://app.customgpt.ai/api/v1/'
+api_endpoint = 'https://dev.customgpt.ai/api/v1/'
 
 
 
 # Utilities
 
 def get_citations(api_token, project_id, citation_id):
-    url = "https://app.customgpt.ai/api/v1/projects/"+str(project_id)+"/citations/" +str(citation_id)
+    url = "https://dev.customgpt.ai/api/v1/projects/"+str(project_id)+"/citations/" +str(citation_id)
 
     headers = {
         "accept": "application/json",
@@ -31,10 +31,16 @@ def get_citations(api_token, project_id, citation_id):
                     source = {'title': 'source', 'url': "" }
                 
             except:
-                if result['citation']['page_url'] != None:
-                    source = {'title': 'source', 'url': result['citation']['page_url'] }
-                else:
-                    source = {'title': 'source', 'url': "" }
+                try:
+                    if result['data']['page_url'] != None:
+                        source = {'title': result['data']['title'], 'url': result['data']['page_url'] }
+                    else:
+                        source = {'title': 'source', 'url': "" }
+                except:
+                    if result['citation']['page_url'] != None:
+                        source = {'title': 'source', 'url': result['citation']['page_url'] }
+                    else:
+                        source = {'title': 'source', 'url': "" }
             
             return source
         else:
@@ -80,6 +86,9 @@ def query_chatbot(api_token, project_id,session_id,message,stream='true', lang='
             resp_data = eval(event.data.replace('null', 'None'))
 
             if resp_data is not None:
+                if resp_data.get('status') == 'error':
+                    response.append(resp_data.get('message', ''))
+
                 if resp_data.get('status') == 'progress':
                     response.append(resp_data.get('message', ''))
 
@@ -103,7 +112,7 @@ def query_chatbot(api_token, project_id,session_id,message,stream='true', lang='
         return ["Error"]
 
 def get_projectList(api_token):
-    url = "https://app.customgpt.ai/api/v1/projects?page=1&order=desc&width=100%25&height=auto"
+    url = "https://dev.customgpt.ai/api/v1/projects?page=1&order=desc&width=100%25&height=auto"
 
     headers = {
         "accept": "application/json",
@@ -122,7 +131,7 @@ def get_projectList(api_token):
         print(f"'erreur")
 
 def get_conversationList(api_token, project_id):
-    url = "https://app.customgpt.ai/api/v1/projects/"+str(project_id) +"/conversations?page=1&order=desc&userFilter=all"
+    url = "https://dev.customgpt.ai/api/v1/projects/"+str(project_id) +"/conversations?page=1&order=desc&userFilter=all"
 
     headers = {
         "accept": "application/json",
@@ -219,6 +228,8 @@ if st.session_state.messages[-1]["role"] != "assistant":
             for item in response:
                 full_response += item
                 placeholder.markdown(full_response)
-
+    if full_response == "":
+        full_response = "You have exhausted your current query credits. Upgrade your plan to keep chatting with customGPT and experience personalized AI!"
+        placeholder.markdown(full_response)
     message = {"role": "assistant", "content": full_response}
     st.session_state.messages.append(message)
