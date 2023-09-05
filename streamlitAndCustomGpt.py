@@ -154,7 +154,7 @@ with st.sidebar:
     if not replicate_api:
         st.warning('Please enter your credentials!', icon='⚠️')
     else:
-        st.success('Please select a project and conversation!', )
+        st.success('API KEY PROVIDED!', )
     os.environ['REPLICATE_API_TOKEN'] = replicate_api
 
     st.subheader('Select a project')
