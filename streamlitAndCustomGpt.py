@@ -4,7 +4,6 @@ import os
 import json
 from sseclient import SSEClient
 import uuid
-import time
 
 api_endpoint = 'https://dev.customgpt.ai/api/v1/'
 
